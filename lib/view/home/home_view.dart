@@ -1,3 +1,8 @@
+import 'dart:developer';
+
+import 'package:carcontrol_mobx/core/helper/dialog_helper.dart';
+import 'package:carcontrol_mobx/core/helper/route_helper.dart';
+import 'package:carcontrol_mobx/view/control/control_view.dart';
 import 'package:carcontrol_mobx/view/home/home_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -6,16 +11,16 @@ class HomeView extends StatefulWidget {
   const HomeView({super.key});
 
   @override
+  // ignore: library_private_types_in_public_api
   _HomeViewState createState() => _HomeViewState();
 }
 
 class _HomeViewState extends State<HomeView> with SingleTickerProviderStateMixin {
-  late AnimationController _animationController;
-
   @override
   void initState() {
     super.initState();
-    _animationController = AnimationController(
+    final cvm = context.read<HomeViewModel>();
+    cvm.animationController = AnimationController(
       vsync: this,
       duration: const Duration(seconds: 2),
     )..repeat();
@@ -23,7 +28,8 @@ class _HomeViewState extends State<HomeView> with SingleTickerProviderStateMixin
 
   @override
   void dispose() {
-    _animationController.dispose();
+    final cvm = context.read<HomeViewModel>();
+    cvm.animationController.dispose();
     super.dispose();
   }
 
@@ -62,10 +68,10 @@ class _HomeViewState extends State<HomeView> with SingleTickerProviderStateMixin
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 AnimatedBuilder(
-                                  animation: _animationController,
+                                  animation: ref.animationController,
                                   builder: (_, child) {
                                     return Transform.rotate(
-                                      angle: _animationController.value * 2 * 3.14,
+                                      angle: ref.animationController.value * 2 * 3.14,
                                       child: child,
                                     );
                                   },
@@ -99,7 +105,25 @@ class _HomeViewState extends State<HomeView> with SingleTickerProviderStateMixin
                                   title: Text(value.devices[index].name ?? 'Bilinmeyen Cihaz'),
                                   subtitle: Text(value.devices[index].address),
                                   trailing: const Icon(Icons.arrow_forward_ios),
-                                  onTap: () => value.connectToDevice(value.devices[index], context),
+                                  onTap: () {
+                                    try {
+                                      value.connectToDevice(value.devices[index], context);
+                                      if (value.connection == null) {
+                                        DialogHelper.connectDialog(
+                                            context, "Hata", "${value.devices[index].name}'e bağlanılamadı");
+                                      } else {
+                                        RouteHelper.pop(context); // Dialog'u kapat
+                                        RouteHelper.push(context,
+                                            ControlView(device: value.devices[index], connection: value.connection!));
+                                      }
+                                    } catch (e) {
+                                      RouteHelper.pop(context); // Dialog'u kapat
+                                      ScaffoldMessenger.of(context).showSnackBar(
+                                        SnackBar(content: Text('Bağlantı başarısız: $e')),
+                                      );
+                                      log(e.toString());
+                                    }
+                                  },
                                 ),
                               );
                             },

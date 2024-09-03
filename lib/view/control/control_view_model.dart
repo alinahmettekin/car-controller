@@ -1,10 +1,16 @@
 import 'dart:developer' as dev;
 
 import 'package:carcontrol_mobx/core/helper/bluetooth_helper.dart';
+import 'package:carcontrol_mobx/core/helper/route_helper.dart';
+import 'package:carcontrol_mobx/view/settings/settings_view.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ControlViewModel extends ChangeNotifier {
+  Future<Map<String, String>> showOptionsScreen(BuildContext context, Map<String, String> currentOptions) async {
+    return await RouteHelper.push(context, SettingsView(currentOptions: currentOptions));
+  }
+
   String direction = "Dur";
   Map<String, String> buttonOptions = {
     'Sol': '',

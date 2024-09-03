@@ -1,10 +1,9 @@
-import 'package:carcontrol_mobx/core/helper/bluetooth_helper.dart';
-import 'package:carcontrol_mobx/view/settings/settings_view.dart';
+import 'package:carcontrol_mobx/view/control/control_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bluetooth_serial/flutter_bluetooth_serial.dart';
 import 'package:flutter_joystick/flutter_joystick.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:provider/provider.dart';
 
 class ControlView extends StatefulWidget {
   final BluetoothDevice device;
@@ -13,6 +12,7 @@ class ControlView extends StatefulWidget {
   const ControlView({super.key, required this.device, required this.connection});
 
   @override
+  // ignore: library_private_types_in_public_api
   _ControlViewState createState() => _ControlViewState();
 }
 
@@ -33,7 +33,8 @@ class _ControlViewState extends State<ControlView> {
   @override
   void initState() {
     super.initState();
-    _loadButtonOptions();
+    final cvm = Provider.of<ControlViewModel>(context, listen: false);
+    cvm.loadButtonOptions();
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.landscapeLeft,
       DeviceOrientation.landscapeRight,
@@ -49,43 +50,10 @@ class _ControlViewState extends State<ControlView> {
     super.dispose();
   }
 
-  Future<void> sendData(String data) async {
-    if (data.isNotEmpty) {
-      try {
-        BluetoothHelper.sendData;
-        print('Veri gönderildi: $data');
-      } catch (e) {
-        print('Veri gönderme hatası: $e');
-        // Hata durumunda kullanıcıya bilgi verebilirsiniz
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Veri gönderme hatası: $e')),
-        );
-      }
-    }
-  }
-
-  _loadButtonOptions() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    setState(() {
-      buttonOptions.forEach((key, value) {
-        buttonOptions[key] = prefs.getString(key) ?? '';
-      });
-    });
-  }
-
-  void _sendCommand(String command) {
-    if (command.isNotEmpty) {
-      print('Gönderilen komut: $command');
-      print(buttonOptions);
-      sendData(command);
-
-      // Burada Bluetooth üzerinden komutu gönderme işlemi yapılacak
-    }
-  }
-
   Widget _buildButton(String label, IconData icon) {
+    final cvm = Provider.of<ControlViewModel>(context, listen: true);
     return ElevatedButton(
-      onPressed: () => _sendCommand(buttonOptions[label] ?? ''),
+      onPressed: () => cvm.sendCommand(buttonOptions[label] ?? ''),
       style: ElevatedButton.styleFrom(
         shape: const CircleBorder(),
         padding: const EdgeInsets.all(12), // Padding'i azalttık
@@ -106,14 +74,14 @@ class _ControlViewState extends State<ControlView> {
           style: const TextStyle(fontSize: 17),
         ),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.menu),
-            onPressed: () async {
-              final updatedOptions = await showOptionsScreen(context, buttonOptions);
-              setState(() {
+          Consumer<ControlViewModel>(
+            builder: (context, value, child) => IconButton(
+              icon: const Icon(Icons.menu),
+              onPressed: () async {
+                final updatedOptions = await value.showOptionsScreen(context, buttonOptions);
                 buttonOptions = updatedOptions;
-              });
-            },
+              },
+            ),
           ),
         ],
       ),
@@ -128,28 +96,30 @@ class _ControlViewState extends State<ControlView> {
                 SizedBox(
                   width: 100,
                   height: 100,
-                  child: Joystick(
-                    mode: JoystickMode.all,
-                    listener: (details) {
-                      setState(() {
-                        if (details.x > 0.5) {
-                          _direction = "Sağ";
-                          _sendCommand(buttonOptions['Sağ'] ?? '');
-                        } else if (details.x < -0.5) {
-                          _direction = "Sol";
-                          _sendCommand(buttonOptions['Sol'] ?? '');
-                        } else if (details.y > 0.5) {
-                          _direction = "Geri";
-                          _sendCommand(buttonOptions['Geri'] ?? '');
-                        } else if (details.y < -0.5) {
-                          _direction = "İleri";
-                          _sendCommand(buttonOptions['İleri'] ?? '');
-                        } else {
-                          _direction = "Dur";
-                          _sendCommand(buttonOptions['Dur'] ?? '');
-                        }
-                      });
-                    },
+                  child: Consumer<ControlViewModel>(
+                    builder: (context, value, child) => Joystick(
+                      mode: JoystickMode.all,
+                      listener: (details) {
+                        setState(() {
+                          if (details.x > 0.5) {
+                            _direction = "Sağ";
+                            value.sendCommand(buttonOptions['Sağ'] ?? '');
+                          } else if (details.x < -0.5) {
+                            _direction = "Sol";
+                            value.sendCommand(buttonOptions['Sol'] ?? '');
+                          } else if (details.y > 0.5) {
+                            _direction = "Geri";
+                            value.sendCommand(buttonOptions['Geri'] ?? '');
+                          } else if (details.y < -0.5) {
+                            _direction = "İleri";
+                            value.sendCommand(buttonOptions['İleri'] ?? '');
+                          } else {
+                            _direction = "Dur";
+                            value.sendCommand(buttonOptions['Dur'] ?? '');
+                          }
+                        });
+                      },
+                    ),
                   ),
                 ),
                 const SizedBox(height: 5),
