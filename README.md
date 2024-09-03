@@ -1,6 +1,6 @@
-# carcontrol_mobx
+# car_controller
 
-A new Flutter project.
+Flutter project for manage HC-05 module.
 
 ## Getting Started
 
