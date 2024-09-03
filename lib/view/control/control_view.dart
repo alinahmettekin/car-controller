@@ -1,3 +1,4 @@
+import 'package:carcontrol_mobx/core/constants/text_constants.dart';
 import 'package:carcontrol_mobx/view/control/control_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -70,7 +71,7 @@ class _ControlViewState extends State<ControlView> {
       appBar: AppBar(
         backgroundColor: const Color(0xFF1E1E1E),
         title: Text(
-          '${widget.device.name} Kontrol',
+          '${widget.device.name} ${TextConstants.controlLabel}',
           style: const TextStyle(fontSize: 17),
         ),
         actions: [

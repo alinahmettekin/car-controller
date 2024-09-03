@@ -1,3 +1,4 @@
+import 'package:carcontrol_mobx/core/constants/text_constants.dart';
 import 'package:carcontrol_mobx/view/settings/settings_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -49,7 +50,7 @@ class _SettingsViewState extends State<SettingsView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Tuş Ayarları'),
+        title: const Text(TextConstants.buttonOptionsText),
         leading: Consumer<SettingsViewModel>(
           builder: (context, value, child) => IconButton(
             icon: const Icon(Icons.arrow_back),
@@ -71,7 +72,7 @@ class _SettingsViewState extends State<SettingsView> {
                 child: TextField(
                   controller: ref.controllers[key],
                   decoration: const InputDecoration(
-                    hintText: 'Değer girin',
+                    hintText: TextConstants.inputValueText,
                   ),
                   onChanged: (value) {
                     ref.buttonOptions[key] = value;

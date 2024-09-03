@@ -1,5 +1,6 @@
 import 'dart:developer';
 
+import 'package:carcontrol_mobx/core/constants/text_constants.dart';
 import 'package:carcontrol_mobx/core/helper/dialog_helper.dart';
 import 'package:carcontrol_mobx/core/helper/route_helper.dart';
 import 'package:carcontrol_mobx/view/control/control_view.dart';
@@ -38,7 +39,7 @@ class _HomeViewState extends State<HomeView> with SingleTickerProviderStateMixin
     return Scaffold(
       appBar: AppBar(
         title: const Text(
-          'Uzaktan Araç Kontrol',
+          TextConstants.distanceControlText,
           style: TextStyle(fontSize: 17),
         ),
         backgroundColor: Colors.transparent,
@@ -78,10 +79,10 @@ class _HomeViewState extends State<HomeView> with SingleTickerProviderStateMixin
                                   child: const Icon(Icons.refresh),
                                 ),
                                 const SizedBox(width: 10),
-                                const Text('Taranıyor...'),
+                                const Text(TextConstants.scanningText),
                               ],
                             )
-                          : const Text('Cihazları Tara'),
+                          : const Text(TextConstants.scanDevicesText),
                     ),
                   );
                 },
@@ -92,7 +93,7 @@ class _HomeViewState extends State<HomeView> with SingleTickerProviderStateMixin
                   return Expanded(
                     child: value.devices.isEmpty
                         ? const Center(
-                            child: Text('Henüz cihaz bulunamadı.'),
+                            child: Text(TextConstants.noDevicesText),
                           )
                         : ListView.builder(
                             itemCount: value.devices.length,
@@ -102,7 +103,7 @@ class _HomeViewState extends State<HomeView> with SingleTickerProviderStateMixin
                                 margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
                                 child: ListTile(
                                   leading: const Icon(Icons.bluetooth, color: Colors.blue),
-                                  title: Text(value.devices[index].name ?? 'Bilinmeyen Cihaz'),
+                                  title: Text(value.devices[index].name ?? TextConstants.unknownDevice),
                                   subtitle: Text(value.devices[index].address),
                                   trailing: const Icon(Icons.arrow_forward_ios),
                                   onTap: () {
