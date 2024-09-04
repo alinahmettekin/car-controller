@@ -1,29 +1,34 @@
+import 'package:carcontrol_mobx/core/theme/app_theme.dart';
+import 'package:carcontrol_mobx/view/control/control_view_model.dart';
 import 'package:carcontrol_mobx/view/home/home_view.dart';
+import 'package:carcontrol_mobx/view/home/home_view_model.dart';
+import 'package:carcontrol_mobx/view/settings/settings_view.dart';
+import 'package:carcontrol_mobx/view/settings/settings_view_model.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 void main() {
-  runApp(const HomeApplication());
+  runApp(const CarControllerApp());
 }
 
-class HomeApplication extends StatelessWidget {
-  const HomeApplication({super.key});
+class CarControllerApp extends StatelessWidget {
+  const CarControllerApp({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: "HC-05 Controller",
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-        brightness: Brightness.dark,
-        scaffoldBackgroundColor: const Color(0xFF1E1E1E),
-        textTheme: const TextTheme(
-          bodyLarge: TextStyle(fontSize: 14),
-          bodyMedium: TextStyle(fontSize: 11),
-          bodySmall: TextStyle(fontSize: 9),
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(
+          create: (context) => ControlViewModel(),
         ),
-      ),
-      home: HomeView(),
+        ChangeNotifierProvider(
+          create: (context) => HomeViewModel(),
+        ),
+        ChangeNotifierProvider(
+          create: (context) => SettingsViewModel(),
+        )
+      ],
+      child: const HomeView(),
     );
   }
 }
