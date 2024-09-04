@@ -2,9 +2,9 @@ import 'dart:developer' as dev;
 
 import 'package:carcontrol_mobx/core/helper/bluetooth_helper.dart';
 import 'package:carcontrol_mobx/core/helper/route_helper.dart';
+import 'package:carcontrol_mobx/core/helper/shared_preferences_helper.dart';
 import 'package:carcontrol_mobx/view/settings/settings_view.dart';
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class ControlViewModel extends ChangeNotifier {
   Future<Map<String, String>> showOptionsScreen(BuildContext context, Map<String, String> currentOptions) async {
@@ -37,10 +37,8 @@ class ControlViewModel extends ChangeNotifier {
   }
 
   void loadButtonOptions() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-
     buttonOptions.forEach((key, value) {
-      buttonOptions[key] = prefs.getString(key) ?? '';
+      buttonOptions[key] = SharedPreferencesHelper.getString(key);
     });
   }
 

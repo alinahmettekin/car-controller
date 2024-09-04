@@ -1,7 +1,7 @@
 import 'package:carcontrol_mobx/core/helper/route_helper.dart';
+import 'package:carcontrol_mobx/core/helper/shared_preferences_helper.dart';
 import 'package:carcontrol_mobx/view/settings/settings_view.dart';
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class SettingsViewModel extends ChangeNotifier {
   late Map<String, String> buttonOptions;
@@ -12,7 +12,6 @@ class SettingsViewModel extends ChangeNotifier {
   }
 
   saveButtonOption(String key, String value) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.setString(key, value);
+    await SharedPreferencesHelper.setString(key, value);
   }
 }
